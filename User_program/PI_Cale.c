@@ -37,18 +37,18 @@ void  PI_Controller(p_PI_Control  pV)
 
 void  PI_Pare_init(void )
 {
-  pi_spd.Kp=_IQ(56);//原工程文件系数为2.2
-  pi_spd.Ki=_IQ(2778);  // 0.0001*10 / 0.2   T*SpeedLoopPrescaler/0.2//原工程系数为0.097
+  pi_spd.Kp=_IQ(5.6);//原工程文件系数为2.2
+  pi_spd.Ki=_IQ(0.97);  // 0.0001*10 / 0.2   T*SpeedLoopPrescaler/0.2//原工程系数为0.097
   pi_spd.Umax =_IQ(0.85);
   pi_spd.Umin =_IQ(0.0);
 
   pi_id.Kp=_IQ(0.00144);  //
-  pi_id.Ki=_IQ(72);  //
+  pi_id.Ki=_IQ(71.717);  //
   pi_id.Umax =_IQ(0.1);
   pi_id.Umin =_IQ(-0.1);
 
   pi_iq.Kp=_IQ(0.00144);
-  pi_iq.Ki=_IQ(72);
+  pi_iq.Ki=_IQ(71.717);
   pi_iq.Umax =_IQ(0.85);
   pi_iq.Umin =_IQ(0.0);
  }
