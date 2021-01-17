@@ -31,6 +31,7 @@
 #include "LCD12864.h"
 #include "KEY.h"
 #include "QEP_encoder.h"
+#include "math.h"
 
 #endif  // end of Main_PMSM_QEncoder.h definition
 

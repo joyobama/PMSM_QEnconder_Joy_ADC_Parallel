@@ -30,21 +30,23 @@ void EPWM3_int(void)
 {
 	  PWM_PeriodMax=SYSTEM_FREQUENCY*1000000*T/2;
 	  PWM_HalfPerMax=PWM_PeriodMax/2;
-	  PWM_Deadband  =2.0*SYSTEM_FREQUENCY;
+	  //PWM_Deadband  =2.0*SYSTEM_FREQUENCY;//原工程死区时间为2us
+	  PWM_Deadband  =4*SYSTEM_FREQUENCY;//死区时间为4us
+
 	  EALLOW;
-      EPwm1Regs.TBCTL.bit.SYNCOSEL = 0;
+      EPwm1Regs.TBCTL.bit.SYNCOSEL = 0;//同步信号
       EPwm2Regs.TBCTL.bit.SYNCOSEL = 0;
       EPwm3Regs.TBCTL.bit.SYNCOSEL = 0;
 
-      EPwm1Regs.TBCTL.bit.PHSEN = 1;
+      EPwm1Regs.TBCTL.bit.PHSEN = 1;//相位控制
       EPwm2Regs.TBCTL.bit.PHSEN = 1;
       EPwm3Regs.TBCTL.bit.PHSEN = 1;
 
-      EPwm1Regs.TBPRD = PWM_PeriodMax;    //  6000
+      EPwm1Regs.TBPRD = PWM_PeriodMax;    //  6000设定PWM周期
       EPwm2Regs.TBPRD = PWM_PeriodMax;
       EPwm3Regs.TBPRD = PWM_PeriodMax;
 
-      EPwm1Regs.TBPHS.half.TBPHS = 0;
+      EPwm1Regs.TBPHS.half.TBPHS = 0;//相位寄存器清零
       EPwm2Regs.TBPHS.half.TBPHS = 0;
       EPwm3Regs.TBPHS.half.TBPHS = 0;
 
@@ -56,26 +58,32 @@ void EPWM3_int(void)
       EPwm2Regs.CMPCTL.all = 0;
       EPwm3Regs.CMPCTL.all = 0;
 
-      EPwm1Regs.AQCTLA.all = 0x0090;
+      EPwm1Regs.AQCTLA.all = 0x0090;//原工程
       EPwm2Regs.AQCTLA.all = 0x0090;
-      EPwm3Regs.AQCTLA.all = 0x0090;
+      EPwm3Regs.AQCTLA.all = 0x0090;//高电平有效互补输出
+//      EPwm1Regs.AQCTLA.all = 0x0060;//低电平有效互补输出
+//      EPwm2Regs.AQCTLA.all = 0x0060;
+//      EPwm3Regs.AQCTLA.all = 0x0060;
 
       EPwm1Regs.DBCTL.all = 0x000B;  // 0x0003
       EPwm2Regs.DBCTL.all = 0x000B;  // 全一致  低电平
-      EPwm3Regs.DBCTL.all = 0x000B;
+      EPwm3Regs.DBCTL.all = 0x000B;//高电平有效，使能上升沿死区和下降沿死区
+//      EPwm1Regs.DBCTL.all = 0x0007;  // 0x0003
+//      EPwm2Regs.DBCTL.all = 0x0007;  // 低电平有效，使能上升沿死区和下降沿死区
+//      EPwm3Regs.DBCTL.all = 0x0007;
 
-      EPwm1Regs.DBFED =  PWM_Deadband;
-      EPwm1Regs.DBRED =  PWM_Deadband;
+      EPwm1Regs.DBFED =  PWM_Deadband;//下降沿死区时间
+      EPwm1Regs.DBRED =  PWM_Deadband;//上升沿死区时间
       EPwm2Regs.DBFED =  PWM_Deadband;
       EPwm2Regs.DBRED =  PWM_Deadband;
       EPwm3Regs.DBFED =  PWM_Deadband;
       EPwm3Regs.DBRED =  PWM_Deadband;
 
-      EPwm1Regs.PCCTL.all = 0;
+      EPwm1Regs.PCCTL.all = 0;//斩波控制
       EPwm2Regs.PCCTL.all = 0;
       EPwm3Regs.PCCTL.all = 0;
 
-      EPwm1Regs.TZSEL.all = 0;
+      EPwm1Regs.TZSEL.all = 0;//出现trip event时，输出高阻态
       EPwm2Regs.TZSEL.all = 0;
       EPwm3Regs.TZSEL.all = 0;
 
@@ -87,14 +95,15 @@ void HVDMC_Protection(void)
 
       EALLOW;
 
-      EPwm1Regs.TZSEL.bit.CBC6=0x1;
-      EPwm2Regs.TZSEL.bit.CBC6=0x1;
-      EPwm3Regs.TZSEL.bit.CBC6=0x1;
+      EPwm1Regs.TZSEL.bit.CBC6=0x1;//enable TZ6 for CBC
+      EPwm2Regs.TZSEL.bit.CBC6=0x1;//enable TZ6 for CBC
+      EPwm3Regs.TZSEL.bit.CBC6=0x1;//enable TZ6 for CBC
 
       EPwm1Regs.TZSEL.bit.OSHT1   = 1;  //enable TZ1 for OSHT
       EPwm2Regs.TZSEL.bit.OSHT1   = 1;  //enable TZ1 for OSHT
       EPwm3Regs.TZSEL.bit.OSHT1   = 1;  //enable TZ1 for OSHT
 
+      //原工程，高电平有效，保护时强制拉低，关断开关管
       EPwm1Regs.TZCTL.bit.TZA = TZ_FORCE_LO; // EPWMxA will go low
       EPwm1Regs.TZCTL.bit.TZB = TZ_FORCE_LO; // EPWMxB will go low
 
@@ -103,6 +112,17 @@ void HVDMC_Protection(void)
 
       EPwm3Regs.TZCTL.bit.TZA = TZ_FORCE_LO; // EPWMxA will go low
       EPwm3Regs.TZCTL.bit.TZB = TZ_FORCE_LO; // EPWMxB will go low
+      //原工程，高电平有效，保护时强制拉低，关断开关管
+      //原工程，高电平有效，保护时强制拉低，关断开关管
+//      EPwm1Regs.TZCTL.bit.TZA = TZ_FORCE_HI; // EPWMxA will go high
+//      EPwm1Regs.TZCTL.bit.TZB = TZ_FORCE_HI; // EPWMxB will go high
+
+//      EPwm2Regs.TZCTL.bit.TZA = TZ_FORCE_HI; // EPWMxA will go high//
+//      EPwm2Regs.TZCTL.bit.TZB = TZ_FORCE_HI; // EPWMxB will go high
+
+//      EPwm3Regs.TZCTL.bit.TZA = TZ_FORCE_HI; // EPWMxA will go high
+//      EPwm3Regs.TZCTL.bit.TZB = TZ_FORCE_HI; // EPWMxB will go high
+      //原工程，高电平有效，保护时强制拉低，关断开关管
 
       EDIS;
 
@@ -119,13 +139,19 @@ void  Svpwm_Outpwm(void)
 void STOP_CAR(void)           //  上下桥臂 全为低
 {
 	EALLOW;
-	 EPwm1Regs.DBCTL.bit.POLSEL = 0;
-	 EPwm2Regs.DBCTL.bit.POLSEL = 0;
-	 EPwm3Regs.DBCTL.bit.POLSEL = 0;
+	 EPwm1Regs.DBCTL.bit.POLSEL = 0;//转变为高电平有效，非互补模式
+	 EPwm2Regs.DBCTL.bit.POLSEL = 0;//转变为高电平有效，非互补模式
+	 EPwm3Regs.DBCTL.bit.POLSEL = 0;//转变为高电平有效，非互补模式
+//	 EPwm1Regs.DBCTL.bit.POLSEL = 0x3;//转变为低电平有效，非互补模式
+//	 EPwm2Regs.DBCTL.bit.POLSEL = 0x3;//转变为低电平有效，非互补模式
+//	 EPwm3Regs.DBCTL.bit.POLSEL = 0x3;//转变为低电平有效，非互补模式
 
-	 EPwm1Regs.AQCSFRC.all = 0x05;
-	 EPwm2Regs.AQCSFRC.all = 0x05;
-	 EPwm3Regs.AQCSFRC.all = 0x05;
+	 EPwm1Regs.AQCSFRC.all = 0x05;//启动一个软中断，软中断强制清零
+	 EPwm2Regs.AQCSFRC.all = 0x05;//启动一个软中断，软中断强制清零
+	 EPwm3Regs.AQCSFRC.all = 0x05;//启动一个软中断，软中断强制清零
+//	 EPwm1Regs.AQCSFRC.all = 0x06;//启动一个软中断，软中断强制置一
+//	 EPwm2Regs.AQCSFRC.all = 0x06;//启动一个软中断，软中断强制置一
+//	 EPwm3Regs.AQCSFRC.all = 0x06;//启动一个软中断，软中断强制置一
 	 EDIS;
 }
 
@@ -133,13 +159,16 @@ void STOP_CAR(void)           //  上下桥臂 全为低
 void START_CAR(void)   //   上下桥臂 对称互补
 {
 	EALLOW;
-	 EPwm1Regs.DBCTL.bit.POLSEL = 2;
-	 EPwm2Regs.DBCTL.bit.POLSEL = 2;
-	 EPwm3Regs.DBCTL.bit.POLSEL = 2;
+	 EPwm1Regs.DBCTL.bit.POLSEL = 2;//激活高电平有效互补输出模式
+	 EPwm2Regs.DBCTL.bit.POLSEL = 2;//激活高电平有效互补输出模式
+	 EPwm3Regs.DBCTL.bit.POLSEL = 2;//激活高电平有效互补输出模式
+//	 EPwm1Regs.DBCTL.bit.POLSEL = 1;//激活低电平有效互补输出模式
+//     EPwm2Regs.DBCTL.bit.POLSEL = 1;//激活低电平有效互补输出模式
+//     EPwm3Regs.DBCTL.bit.POLSEL = 1;//激活低电平有效互补输出模式
 
-	 EPwm1Regs.AQCSFRC.all = 0x00;
-	 EPwm2Regs.AQCSFRC.all = 0x00;
-	 EPwm3Regs.AQCSFRC.all = 0x00;
+	 EPwm1Regs.AQCSFRC.all = 0x00;//软件强制寄存器，不强制动作，正常运行
+	 EPwm2Regs.AQCSFRC.all = 0x00;//软件强制寄存器，不强制动作，正常运行
+	 EPwm3Regs.AQCSFRC.all = 0x00;//软件强制寄存器，不强制动作，正常运行
 	EDIS;
 }
 

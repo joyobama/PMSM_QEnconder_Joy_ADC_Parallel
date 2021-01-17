@@ -43,6 +43,10 @@ User_program/Main_PMSM_QEncoder.obj: E:/workspace_2021/PMSM_QEnconder_Joy_ADC_pa
 User_program/Main_PMSM_QEncoder.obj: E:/workspace_2021/PMSM_QEnconder_Joy_ADC_parallel/User_include/LCD12864.h
 User_program/Main_PMSM_QEncoder.obj: E:/workspace_2021/PMSM_QEnconder_Joy_ADC_parallel/User_include/KEY.h
 User_program/Main_PMSM_QEncoder.obj: E:/workspace_2021/PMSM_QEnconder_Joy_ADC_parallel/User_include/QEP_encoder.h
+User_program/Main_PMSM_QEncoder.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-c2000_18.1.2.LTS/include/math.h
+User_program/Main_PMSM_QEncoder.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-c2000_18.1.2.LTS/include/_ti_config.h
+User_program/Main_PMSM_QEncoder.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-c2000_18.1.2.LTS/include/linkage.h
+User_program/Main_PMSM_QEncoder.obj: C:/ti/ccsv8/tools/compiler/ti-cgt-c2000_18.1.2.LTS/include/_defs.h
 
 ../User_program/Main_PMSM_QEncoder.c: 
 E:/workspace_2021/PMSM_QEnconder_Joy_ADC_parallel/User_include/Main_PMSM_QEncoder.h: 
@@ -87,3 +91,7 @@ E:/workspace_2021/PMSM_QEnconder_Joy_ADC_parallel/User_include/Svpwm_dq.h:
 E:/workspace_2021/PMSM_QEnconder_Joy_ADC_parallel/User_include/LCD12864.h: 
 E:/workspace_2021/PMSM_QEnconder_Joy_ADC_parallel/User_include/KEY.h: 
 E:/workspace_2021/PMSM_QEnconder_Joy_ADC_parallel/User_include/QEP_encoder.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-c2000_18.1.2.LTS/include/math.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-c2000_18.1.2.LTS/include/_ti_config.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-c2000_18.1.2.LTS/include/linkage.h: 
+C:/ti/ccsv8/tools/compiler/ti-cgt-c2000_18.1.2.LTS/include/_defs.h: 

@@ -67,6 +67,7 @@ void main(void)
    Init_QEP_Gpio( );
    //Init_FMQ_voice( );
    InitScirs232bGpio();
+
    Init_LCD12864_Gpio();
    //Initaliaze SPI of DAC TLV5610
    InitSpi();
@@ -162,7 +163,7 @@ interrupt void MainISR(void)
 		pi_spd.OutF= _IQmpy(FilK1,pi_spd.OutF)+_IQmpy(FilK2,pi_spd.Out);
 	    send_to_SPI((short)(TestPare.Speed_fact),0,0);
 	    send_to_SPI((short)(TestPare.Speed_target),0,1);
-	    send_to_SPI((short)(ADCSampPare.BUS_Curr),0,2);
+//	    send_to_SPI((short)(ADCSampPare.BUS_Curr),0,2);
 	}
 
 	  ClarkeI.As=ADCSampPare.PhaseA_Curr;
@@ -179,6 +180,7 @@ interrupt void MainISR(void)
 	  ParkI.Cosine = _IQcosPU(ParkI.Angle);
 
 	  PARK_Cale((p_PARK)&ParkI);
+	  send_to_SPI((short)(ParkI.Ds),0,2);
 
 	  pi_id.Ref = _IQ(0.0);
 	  pi_iq.Ref= pi_spd.Out;
@@ -213,8 +215,8 @@ interrupt void MainISR(void)
 	  IparkU.Cosine = ParkI.Cosine;
 
 	  send_to_SPI((short)(EQEPPare.ElecTheta),0,3);
-	  send_to_SPI((short)(ADCSampPare.Fluxgate_D),0,4);
-	  send_to_SPI((short)(ADCSampPare.Fluxgate_Q),0,5);
+//	  send_to_SPI((short)(ADCSampPare.Fluxgate_D),0,4);
+//	  send_to_SPI((short)(ADCSampPare.Fluxgate_Q),0,5);
 	  EQEPPare.ElecTheta= EQEPPare.ElecThetaYS + EQEPPare.initial_angle;
 	  if( EQEPPare.ElecTheta > _IQ(1.0))
 		  EQEPPare.ElecTheta-= _IQ(1.0) ;
