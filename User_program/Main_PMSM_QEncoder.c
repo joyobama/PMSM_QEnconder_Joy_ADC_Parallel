@@ -50,7 +50,10 @@ unsigned char  Str2[17]={"2021年01月17日\0"};
 unsigned char  Str3[17]={"新年快乐\0"};
 
 Uint16   PWMStart_Flag=0,BUS_Curr=0,BUS_Curr1=0;
-unsigned long test_var=0;
+double Fluxgate_Angle=0.0;
+_iq test_var=0;
+_iq Angle_Max=1000;
+_iq Angle_Min=100;
 
 interrupt void OffsetISR(void);
 
@@ -175,7 +178,17 @@ interrupt void MainISR(void)
 	  ParkI.Beta=ClarkeI.Beta;
 
 	  ParkI.Angle = EQEPPare.ElecTheta;
+	  if (ParkI.Angle > Angle_Max)
+	      Angle_Max=ParkI.Angle;
+	  else if (ParkI.Angle < Angle_Min)
+	      Angle_Min=ParkI.Angle;
 	  send_to_SPI((short)(ParkI.Angle>>13),0,3);//                                         DAC的D口为电气转子位置
+	  send_to_SPI((short)(ADCSampPare.Fluxgate_D),0,4);
+	  send_to_SPI((short)(ADCSampPare.Fluxgate_Q),0,5);
+	  Fluxgate_Angle= atan2((ADCSampPare.Fluxgate_D-2048),(ADCSampPare.Fluxgate_Q-2048));
+	  test_var=Fluxgate_Angle/PI*2048;
+	  send_to_SPI((short)(test_var),2048,6);
+
 
 	  ParkI.Sine = _IQsinPU(ParkI.Angle);
 	  ParkI.Cosine = _IQcosPU(ParkI.Angle);
@@ -215,8 +228,6 @@ interrupt void MainISR(void)
 	  IparkU.Sine   = ParkI.Sine;
 	  IparkU.Cosine = ParkI.Cosine;
 
-//	  send_to_SPI((short)(ADCSampPare.Fluxgate_D),0,4);
-//	  send_to_SPI((short)(ADCSampPare.Fluxgate_Q),0,5);
 	  EQEPPare.ElecTheta= EQEPPare.ElecThetaYS + EQEPPare.initial_angle;
 	  if( EQEPPare.ElecTheta > _IQ(1.0))
 		  EQEPPare.ElecTheta-= _IQ(1.0) ;

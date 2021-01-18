@@ -33,6 +33,8 @@
 #include "QEP_encoder.h"
 #include "math.h"
 
+#define PI 3.14159265358979
+
 #endif  // end of Main_PMSM_QEncoder.h definition
 
 //===========================================================================
