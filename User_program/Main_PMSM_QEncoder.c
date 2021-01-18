@@ -42,14 +42,15 @@ SVPWM        Svpwmdq=SVPWM_DEFAULTS;
 
 //_iq   FilK1=_IQ(0.328);//上个状态的加权系数，用于状态的加权平滑
 //_iq   FilK2=_IQ(0.672);//当前状态的加权系数，用于状态的加权平滑
-_iq   FilK1=_IQ(0.01);
-_iq   FilK2=_IQ(0.99);
+_iq   FilK1=_IQ(0.328);
+_iq   FilK2=_IQ(0.672);
 
 unsigned char  Str1[17]={"印制电机驱动3.0\0"};
-unsigned char  Str2[17]={"2021年01月02日\0"};
+unsigned char  Str2[17]={"2021年01月17日\0"};
 unsigned char  Str3[17]={"新年快乐\0"};
 
 Uint16   PWMStart_Flag=0,BUS_Curr=0,BUS_Curr1=0;
+unsigned long test_var=0;
 
 interrupt void OffsetISR(void);
 
@@ -67,7 +68,6 @@ void main(void)
    Init_QEP_Gpio( );
    //Init_FMQ_voice( );
    InitScirs232bGpio();
-
    Init_LCD12864_Gpio();
    //Initaliaze SPI of DAC TLV5610
    InitSpi();
@@ -161,8 +161,8 @@ interrupt void MainISR(void)
 
 		PI_Controller((p_PI_Control)&pi_spd);
 		pi_spd.OutF= _IQmpy(FilK1,pi_spd.OutF)+_IQmpy(FilK2,pi_spd.Out);
-	    send_to_SPI((short)(TestPare.Speed_fact),0,0);
-	    send_to_SPI((short)(TestPare.Speed_target),0,1);
+	    send_to_SPI((short)(TestPare.Speed_fact),0,0);//                               DAC的A口为实际转速，即编码器转速
+	    send_to_SPI((short)(TestPare.Speed_target),0,1);//                             DAC的B口为目标转速，即电位器给定
 //	    send_to_SPI((short)(ADCSampPare.BUS_Curr),0,2);
 	}
 
@@ -175,12 +175,13 @@ interrupt void MainISR(void)
 	  ParkI.Beta=ClarkeI.Beta;
 
 	  ParkI.Angle = EQEPPare.ElecTheta;
+	  send_to_SPI((short)(ParkI.Angle>>16),0,3);//                                         DAC的D口为电气转子位置
 
 	  ParkI.Sine = _IQsinPU(ParkI.Angle);
 	  ParkI.Cosine = _IQcosPU(ParkI.Angle);
 
 	  PARK_Cale((p_PARK)&ParkI);
-	  send_to_SPI((short)(ParkI.Ds),0,2);
+	  send_to_SPI((short)((ParkI.Ds>>16)),2048,2);//  long数据类型直接移位就完事了。DAC的C口为Id电流，因为变量为long(32bit)，故这里只取前12bit
 
 	  pi_id.Ref = _IQ(0.0);
 	  pi_iq.Ref= pi_spd.Out;
@@ -214,7 +215,6 @@ interrupt void MainISR(void)
 	  IparkU.Sine   = ParkI.Sine;
 	  IparkU.Cosine = ParkI.Cosine;
 
-	  send_to_SPI((short)(EQEPPare.ElecTheta),0,3);
 //	  send_to_SPI((short)(ADCSampPare.Fluxgate_D),0,4);
 //	  send_to_SPI((short)(ADCSampPare.Fluxgate_Q),0,5);
 	  EQEPPare.ElecTheta= EQEPPare.ElecThetaYS + EQEPPare.initial_angle;
