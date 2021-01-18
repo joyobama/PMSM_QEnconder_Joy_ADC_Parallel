@@ -175,7 +175,7 @@ interrupt void MainISR(void)
 	  ParkI.Beta=ClarkeI.Beta;
 
 	  ParkI.Angle = EQEPPare.ElecTheta;
-	  send_to_SPI((short)(ParkI.Angle>>16),0,3);//                                         DAC的D口为电气转子位置
+	  send_to_SPI((short)(ParkI.Angle>>13),0,3);//                                         DAC的D口为电气转子位置
 
 	  ParkI.Sine = _IQsinPU(ParkI.Angle);
 	  ParkI.Cosine = _IQcosPU(ParkI.Angle);
