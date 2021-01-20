@@ -113,10 +113,10 @@ void   ADC_Sample(void )
     ADCSampPare.PhaseB_Voltage = AdcMirror.ADCRESULT8 ;
     ADCSampPare.PhaseC_Voltage = AdcMirror.ADCRESULT9 ;
 */
-//    ADCSampPare.Fluxgate_D = _IQmpy(FilK2,AdcMirror.ADCRESULT4)+ _IQmpy(FilK1,ADCSampPare.Fluxgate_D);
-//    ADCSampPare.Fluxgate_Q = _IQmpy(FilK2,AdcMirror.ADCRESULT5)+ _IQmpy(FilK1,ADCSampPare.Fluxgate_Q);
-    ADCSampPare.Fluxgate_D = AdcMirror.ADCRESULT4;
-    ADCSampPare.Fluxgate_Q = AdcMirror.ADCRESULT5;
+    ADCSampPare.Fluxgate_D = _IQmpy(FilK2,AdcMirror.ADCRESULT4)+ _IQmpy(FilK1,ADCSampPare.Fluxgate_D);
+    ADCSampPare.Fluxgate_Q = _IQmpy(FilK2,AdcMirror.ADCRESULT5)+ _IQmpy(FilK1,ADCSampPare.Fluxgate_Q);
+//    ADCSampPare.Fluxgate_D = AdcMirror.ADCRESULT4;
+//    ADCSampPare.Fluxgate_Q = AdcMirror.ADCRESULT5;
 
     ADCSampPare.RP3_Voltage =_IQ12toIQ (AdcMirror.ADCRESULT6) ;
     ADCSampPare.RP2_Voltage =_IQ12toIQ (AdcMirror.ADCRESULT7) ;
