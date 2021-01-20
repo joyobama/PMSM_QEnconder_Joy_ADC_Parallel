@@ -178,18 +178,21 @@ interrupt void MainISR(void)
 	  ParkI.Beta=ClarkeI.Beta;
 
 	  ParkI.Angle = EQEPPare.ElecTheta;
-	  if (ParkI.Angle > Angle_Max)
-	      Angle_Max=ParkI.Angle;
-	  else if (ParkI.Angle < Angle_Min)
-	      Angle_Min=ParkI.Angle;
-	  send_to_SPI((short)(ParkI.Angle>>13),0,3);//                                         DAC的D口为电气转子位置
+	  //磁通门信号处理
+//	  if (ParkI.Angle > Angle_Max)
+//	      Angle_Max=ParkI.Angle;
+//	  else if (ParkI.Angle < Angle_Min)
+//	      Angle_Min=ParkI.Angle;
+	  send_to_SPI((short)(EQEPPare.ElecTheta>>13),0,3);//                                         DAC的D口为电气转子位置
 	  send_to_SPI((short)(ADCSampPare.Fluxgate_D),0,4);
 	  send_to_SPI((short)(ADCSampPare.Fluxgate_Q),0,5);
-	  Fluxgate_Angle= atan2((ADCSampPare.Fluxgate_D-2048),(ADCSampPare.Fluxgate_Q-2048));
-	  test_var=Fluxgate_Angle/PI*2048;
-	  send_to_SPI((short)(test_var),2048,6);
-
-
+	  Fluxgate_Angle= atan2((ADCSampPare.Fluxgate_Q-2048),(ADCSampPare.Fluxgate_D-2048));
+	  test_var=(Fluxgate_Angle/PI+1.0)*8388608;
+	  send_to_SPI((short)(test_var>>13),0,6);
+	  Angle_Max= test_var-EQEPPare.ElecTheta;
+	  send_to_SPI((short)(Angle_Max),2048,7);
+//	  ParkI.Angle = test_var-75659001;
+//	  ParkI.Angle =Fluxgate_Angle;
 	  ParkI.Sine = _IQsinPU(ParkI.Angle);
 	  ParkI.Cosine = _IQcosPU(ParkI.Angle);
 
