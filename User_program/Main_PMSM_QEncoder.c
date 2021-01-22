@@ -177,7 +177,7 @@ interrupt void MainISR(void)
 	  ParkI.Alpha=ClarkeI.Alpha;
 	  ParkI.Beta=ClarkeI.Beta;
 
-//	  ParkI.Angle = EQEPPare.ElecTheta;
+	  ParkI.Angle = EQEPPare.ElecTheta;
 	  //磁通门信号处理
 //	  if (ParkI.Angle > Angle_Max)
 //	      Angle_Max=ParkI.Angle;
@@ -191,7 +191,7 @@ interrupt void MainISR(void)
 	  send_to_SPI((short)(test_var>>12),0,6);
 	  Angle_Max= test_var-EQEPPare.ElecTheta;
 	  send_to_SPI((short)(Angle_Max>>12),2048,7);
-	  ParkI.Angle = test_var-75659001;
+//	  ParkI.Angle = test_var-75659001;
 //	  ParkI.Angle =Fluxgate_Angle;
 	  ParkI.Sine = _IQsinPU(ParkI.Angle);
 	  ParkI.Cosine = _IQcosPU(ParkI.Angle);
@@ -239,10 +239,10 @@ interrupt void MainISR(void)
 	  else if( EQEPPare.ElecTheta < _IQ(0.0))
 		  EQEPPare.ElecTheta+=_IQ(1.0);
 
-//	  Speed_QEPPare.ElecTheta =EQEPPare.ElecTheta;
-	  Speed_QEPPare.ElecTheta =test_var;
-//	  Speed_QEPPare.DirectionQep = (int32)(EQEPPare.DirectionQep);
-	  Speed_QEPPare.DirectionQep = 0;
+	  Speed_QEPPare.ElecTheta =EQEPPare.ElecTheta;
+//	  Speed_QEPPare.ElecTheta =test_var;
+	  Speed_QEPPare.DirectionQep = (int32)(EQEPPare.DirectionQep);
+//	  Speed_QEPPare.DirectionQep = 0;
 	  Speed_QEP_Cale((p_Speed_QEP)&Speed_QEPPare);
 
 	  IPARK_Cale((p_IPARK)&IparkU);
