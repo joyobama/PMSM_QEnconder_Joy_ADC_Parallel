@@ -47,8 +47,8 @@ void  PI_Pare_init(void )
   pi_id.Umax =_IQ(0.1);
   pi_id.Umin =_IQ(-0.1);
 
-  pi_iq.Kp=_IQ(0.00144);
-  pi_iq.Ki=_IQ(71.717);
+  pi_iq.Kp=_IQ(0.144);
+  pi_iq.Ki=_IQ(7.1717);
   pi_iq.Umax =_IQ(0.85);
   pi_iq.Umin =_IQ(0.0);
  }

@@ -164,8 +164,8 @@ interrupt void MainISR(void)
 
 		PI_Controller((p_PI_Control)&pi_spd);
 		pi_spd.OutF= _IQmpy(FilK1,pi_spd.OutF)+_IQmpy(FilK2,pi_spd.Out);
-	    send_to_SPI((short)(TestPare.Speed_fact),0,0);//                               DAC的A口为实际转速，即编码器转速
-	    send_to_SPI((short)(TestPare.Speed_target),0,1);//                             DAC的B口为目标转速，即电位器给定
+//	    send_to_SPI((short)(TestPare.Speed_fact),0,0);//                               DAC的A口为实际转速，即编码器转速
+//	    send_to_SPI((short)(TestPare.Speed_target),0,1);//                             DAC的B口为目标转速，即电位器给定
 //	    send_to_SPI((short)(ADCSampPare.BUS_Curr),0,2);
 	}
 
@@ -177,7 +177,7 @@ interrupt void MainISR(void)
 	  ParkI.Alpha=ClarkeI.Alpha;
 	  ParkI.Beta=ClarkeI.Beta;
 
-	  ParkI.Angle = EQEPPare.ElecTheta;
+//	  ParkI.Angle = EQEPPare.ElecTheta;
 	  //磁通门信号处理
 //	  if (ParkI.Angle > Angle_Max)
 //	      Angle_Max=ParkI.Angle;
@@ -186,8 +186,8 @@ interrupt void MainISR(void)
 	  send_to_SPI((short)(EQEPPare.ElecTheta>>12),0,3);//                                         DAC的D口为电气转子位置
 	  send_to_SPI((short)(ADCSampPare.Fluxgate_D),0,4);
 	  send_to_SPI((short)(ADCSampPare.Fluxgate_Q),0,5);
-	  Fluxgate_Angle= atan2((ADCSampPare.Fluxgate_Q-2048),(ADCSampPare.Fluxgate_D-2048));
-	  test_var=(Fluxgate_Angle/PI+1.0)*8388608;
+	  Fluxgate_Angle= atan2((ADCSampPare.Fluxgate_Q-1986),(ADCSampPare.Fluxgate_D-1986));
+	  test_var=((short)(Fluxgate_Angle*100)/PI+100)*83886.08;
 	  send_to_SPI((short)(test_var>>12),0,6);
 	  Angle_Max= test_var-EQEPPare.ElecTheta;
 	  send_to_SPI((short)(Angle_Max>>12),2048,7);
@@ -201,6 +201,8 @@ interrupt void MainISR(void)
 
 	  pi_id.Ref = _IQ(0.0);
 	  pi_iq.Ref= pi_spd.Out;
+      send_to_SPI((short)((pi_iq.Ref/2147483648*1000000)*4096),2048,0);//                               DAC的A口为实际转速，即编码器转速
+      send_to_SPI((short)((pi_iq.Fbk/2147483648*1000000)*4096),2048,1);//                             DAC的B口为目标转速，即电位器给定
 
 	  pi_id.Fbk = ParkI.Ds;
 	  PI_Controller((p_PI_Control)&pi_id);
@@ -237,8 +239,10 @@ interrupt void MainISR(void)
 	  else if( EQEPPare.ElecTheta < _IQ(0.0))
 		  EQEPPare.ElecTheta+=_IQ(1.0);
 
-	  Speed_QEPPare.ElecTheta =EQEPPare.ElecTheta;
-	  Speed_QEPPare.DirectionQep = (int32)(EQEPPare.DirectionQep);
+//	  Speed_QEPPare.ElecTheta =EQEPPare.ElecTheta;
+	  Speed_QEPPare.ElecTheta =test_var;
+//	  Speed_QEPPare.DirectionQep = (int32)(EQEPPare.DirectionQep);
+	  Speed_QEPPare.DirectionQep = 0;
 	  Speed_QEP_Cale((p_Speed_QEP)&Speed_QEPPare);
 
 	  IPARK_Cale((p_IPARK)&IparkU);
