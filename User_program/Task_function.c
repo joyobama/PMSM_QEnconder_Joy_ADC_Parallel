@@ -50,6 +50,7 @@ void knob_control(void)
 {
 
 	if( ADCSampPare.RP3_Voltage<=_IQ( 0.15))
+//    if( ADCSampPare.RP3_Voltage<=_IQ( 0.25))
 	{
 		 logicContr.drive_car=0;
 		 logicContr.Start_order=0;

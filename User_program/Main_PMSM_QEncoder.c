@@ -52,8 +52,9 @@ unsigned char  Str3[17]={"新年快乐\0"};
 Uint16   PWMStart_Flag=0,BUS_Curr=0,BUS_Curr1=0;
 double Fluxgate_Angle=0.0;
 _iq test_var=0;
-_iq Angle_Max=1000;
-_iq Angle_Min=100;
+_iq fix_var=0;
+_iq Angle_Max=0;
+_iq Angle_Min=16767255;
 
 interrupt void OffsetISR(void);
 
@@ -164,8 +165,8 @@ interrupt void MainISR(void)
 
 		PI_Controller((p_PI_Control)&pi_spd);
 		pi_spd.OutF= _IQmpy(FilK1,pi_spd.OutF)+_IQmpy(FilK2,pi_spd.Out);
-//	    send_to_SPI((short)(TestPare.Speed_fact),0,0);//                               DAC的A口为实际转速，即编码器转速
-//	    send_to_SPI((short)(TestPare.Speed_target),0,1);//                             DAC的B口为目标转速，即电位器给定
+//	    send_to_SPI((short)(TestPare.Speed_fact),0,4);//                               DAC的A口为实际转速，即编码器转速
+//	    send_to_SPI((short)(TestPare.Speed_target),0,5);//                             DAC的B口为目标转速，即电位器给定
 //	    send_to_SPI((short)(ADCSampPare.BUS_Curr),0,2);
 	}
 
@@ -177,22 +178,31 @@ interrupt void MainISR(void)
 	  ParkI.Alpha=ClarkeI.Alpha;
 	  ParkI.Beta=ClarkeI.Beta;
 
-	  ParkI.Angle = EQEPPare.ElecTheta;
 	  //磁通门信号处理
-//	  if (ParkI.Angle > Angle_Max)
-//	      Angle_Max=ParkI.Angle;
-//	  else if (ParkI.Angle < Angle_Min)
-//	      Angle_Min=ParkI.Angle;
 	  send_to_SPI((short)(EQEPPare.ElecTheta>>12),0,3);//                                         DAC的D口为电气转子位置
-	  send_to_SPI((short)(ADCSampPare.Fluxgate_D),0,4);
-	  send_to_SPI((short)(ADCSampPare.Fluxgate_Q),0,5);
+//	  send_to_SPI((short)(ADCSampPare.Fluxgate_D),0,4);
+//	  send_to_SPI((short)(ADCSampPare.Fluxgate_Q),0,5);
+//	  Fluxgate_Angle= atan2((ADCSampPare.Fluxgate_Q-1986),(ADCSampPare.Fluxgate_D-1986));
 	  Fluxgate_Angle= atan2((ADCSampPare.Fluxgate_Q-1986),(ADCSampPare.Fluxgate_D-1986));
+	  Fluxgate_Angle=Fluxgate_Angle+PI;
 	  test_var=((short)(Fluxgate_Angle*100)/PI+100)*83886.08;
-	  send_to_SPI((short)(test_var>>12),0,6);
-	  Angle_Max= test_var-EQEPPare.ElecTheta;
-	  send_to_SPI((short)(Angle_Max>>12),2048,7);
-//	  ParkI.Angle = test_var-75659001;
+//	  fix_var=3792000-5355000*_IQcosPU(0.0000001322*test_var)+8519000*_IQsinPU(0.0000001322*test_var)+1461000*_IQcosPU(0.0000002644*test_var)-3174000*_IQsinPU(0.0000002644*test_var);
+//	  fix_var=790400-11030*test_var*test_var*test_var*test_var-47480*test_var*test_var*test_var+59410*test_var*test_var+58830*test_var;
+	  fix_var=-23700*Fluxgate_Angle*Fluxgate_Angle*Fluxgate_Angle*Fluxgate_Angle+204600*Fluxgate_Angle*Fluxgate_Angle*Fluxgate_Angle-31820*Fluxgate_Angle*Fluxgate_Angle+616200*Fluxgate_Angle-21860;
+	  send_to_SPI((short)(fix_var>>12),0,6);                                                   //G口为磁通门转子位置角
+//	  Angle_Max= fix_var-EQEPPare.ElecTheta;
+	  send_to_SPI((short)(Angle_Max>>12),2048,7);                                               //H口为磁通门转子位置角减去光电转子位置角
+
+//	  ParkI.Angle = EQEPPare.ElecTheta;
+//	  ParkI.Angle = fix_var-75659001;
+	  ParkI.Angle = fix_var;
 //	  ParkI.Angle =Fluxgate_Angle;
+///////////////////////////////////////////////
+	    if (ParkI.Angle > Angle_Max)
+	          Angle_Max=ParkI.Angle;
+	      else if (ParkI.Angle < Angle_Min)
+	          Angle_Min=ParkI.Angle;
+//////////////////////////////////////////////查看他们之间的范围
 	  ParkI.Sine = _IQsinPU(ParkI.Angle);
 	  ParkI.Cosine = _IQcosPU(ParkI.Angle);
 
@@ -201,8 +211,8 @@ interrupt void MainISR(void)
 
 	  pi_id.Ref = _IQ(0.0);
 	  pi_iq.Ref= pi_spd.Out;
-      send_to_SPI((short)((pi_iq.Ref/2147483648*1000000)*4096),2048,0);//                               DAC的A口为实际转速，即编码器转速
-      send_to_SPI((short)((pi_iq.Fbk/2147483648*1000000)*4096),2048,1);//                             DAC的B口为目标转速，即电位器给定
+      send_to_SPI((short)((pi_iq.Ref>>14)),2048,0);//                             DAC的A口为Iq电流给定
+      send_to_SPI((short)((pi_iq.Fbk>>14)),2048,1);//                             DAC的B口为Iq电流反馈
 
 	  pi_id.Fbk = ParkI.Ds;
 	  PI_Controller((p_PI_Control)&pi_id);
