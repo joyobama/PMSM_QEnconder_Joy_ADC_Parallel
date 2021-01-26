@@ -189,6 +189,11 @@ interrupt void MainISR(void)
 //	  fix_var=3792000-5355000*_IQcosPU(0.0000001322*test_var)+8519000*_IQsinPU(0.0000001322*test_var)+1461000*_IQcosPU(0.0000002644*test_var)-3174000*_IQsinPU(0.0000002644*test_var);
 //	  fix_var=790400-11030*test_var*test_var*test_var*test_var-47480*test_var*test_var*test_var+59410*test_var*test_var+58830*test_var;
 	  fix_var=-23700*Fluxgate_Angle*Fluxgate_Angle*Fluxgate_Angle*Fluxgate_Angle+204600*Fluxgate_Angle*Fluxgate_Angle*Fluxgate_Angle-31820*Fluxgate_Angle*Fluxgate_Angle+616200*Fluxgate_Angle-21860;
+	  fix_var=fix_var-3250000;
+	  if(fix_var<0)
+	  {
+	      fix_var=fix_var+16767255;
+	  }
 	  send_to_SPI((short)(fix_var>>12),0,6);                                                   //G口为磁通门转子位置角
 //	  Angle_Max= fix_var-EQEPPare.ElecTheta;
 	  send_to_SPI((short)(Angle_Max>>12),2048,7);                                               //H口为磁通门转子位置角减去光电转子位置角
@@ -198,10 +203,10 @@ interrupt void MainISR(void)
 	  ParkI.Angle = fix_var;
 //	  ParkI.Angle =Fluxgate_Angle;
 ///////////////////////////////////////////////
-	    if (ParkI.Angle > Angle_Max)
-	          Angle_Max=ParkI.Angle;
-	      else if (ParkI.Angle < Angle_Min)
-	          Angle_Min=ParkI.Angle;
+//	    if ((fix_var-ParkI.Angle) > Angle_Max)
+//	          Angle_Max=(fix_var-ParkI.Angle);
+//	      else if ((fix_var-ParkI.Angle) < Angle_Min)
+//	          Angle_Min=(fix_var-ParkI.Angle);
 //////////////////////////////////////////////查看他们之间的范围
 	  ParkI.Sine = _IQsinPU(ParkI.Angle);
 	  ParkI.Cosine = _IQcosPU(ParkI.Angle);
@@ -211,8 +216,8 @@ interrupt void MainISR(void)
 
 	  pi_id.Ref = _IQ(0.0);
 	  pi_iq.Ref= pi_spd.Out;
-      send_to_SPI((short)((pi_iq.Ref>>14)),2048,0);//                             DAC的A口为Iq电流给定
-      send_to_SPI((short)((pi_iq.Fbk>>14)),2048,1);//                             DAC的B口为Iq电流反馈
+//      send_to_SPI((short)((pi_iq.Ref>>14)),2048,0);//                             DAC的A口为Iq电流给定
+//      send_to_SPI((short)((pi_iq.Fbk>>14)),2048,1);//                             DAC的B口为Iq电流反馈
 
 	  pi_id.Fbk = ParkI.Ds;
 	  PI_Controller((p_PI_Control)&pi_id);
@@ -249,10 +254,10 @@ interrupt void MainISR(void)
 	  else if( EQEPPare.ElecTheta < _IQ(0.0))
 		  EQEPPare.ElecTheta+=_IQ(1.0);
 
-	  Speed_QEPPare.ElecTheta =EQEPPare.ElecTheta;
-//	  Speed_QEPPare.ElecTheta =test_var;
-	  Speed_QEPPare.DirectionQep = (int32)(EQEPPare.DirectionQep);
-//	  Speed_QEPPare.DirectionQep = 0;
+//	  Speed_QEPPare.ElecTheta =EQEPPare.ElecTheta;
+	  Speed_QEPPare.ElecTheta =fix_var;
+//	  Speed_QEPPare.DirectionQep = (int32)(EQEPPare.DirectionQep);
+	  Speed_QEPPare.DirectionQep = 0;
 	  Speed_QEP_Cale((p_Speed_QEP)&Speed_QEPPare);
 
 	  IPARK_Cale((p_IPARK)&IparkU);
