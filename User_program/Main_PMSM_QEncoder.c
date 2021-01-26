@@ -165,8 +165,8 @@ interrupt void MainISR(void)
 
 		PI_Controller((p_PI_Control)&pi_spd);
 		pi_spd.OutF= _IQmpy(FilK1,pi_spd.OutF)+_IQmpy(FilK2,pi_spd.Out);
-//	    send_to_SPI((short)(TestPare.Speed_fact),0,4);//                               DAC的A口为实际转速，即编码器转速
-//	    send_to_SPI((short)(TestPare.Speed_target),0,5);//                             DAC的B口为目标转速，即电位器给定
+	    send_to_SPI((short)(TestPare.Speed_fact),0,4);//                               DAC的A口为实际转速，即编码器转速
+	    send_to_SPI((short)(TestPare.Speed_target),0,5);//                             DAC的B口为目标转速，即电位器给定
 //	    send_to_SPI((short)(ADCSampPare.BUS_Curr),0,2);
 	}
 
@@ -179,7 +179,6 @@ interrupt void MainISR(void)
 	  ParkI.Beta=ClarkeI.Beta;
 
 	  //磁通门信号处理
-	  send_to_SPI((short)(EQEPPare.ElecTheta>>12),0,3);//                                         DAC的D口为电气转子位置
 //	  send_to_SPI((short)(ADCSampPare.Fluxgate_D),0,4);
 //	  send_to_SPI((short)(ADCSampPare.Fluxgate_Q),0,5);
 //	  Fluxgate_Angle= atan2((ADCSampPare.Fluxgate_Q-1986),(ADCSampPare.Fluxgate_D-1986));
@@ -195,7 +194,8 @@ interrupt void MainISR(void)
 	      fix_var=fix_var+16767255;
 	  }
 	  send_to_SPI((short)(fix_var>>12),0,6);                                                   //G口为磁通门转子位置角
-//	  Angle_Max= fix_var-EQEPPare.ElecTheta;
+	  send_to_SPI((short)(EQEPPare.ElecTheta>>12),0,3);//                                         DAC的D口为电气转子位置
+	  Angle_Max= fix_var-EQEPPare.ElecTheta;
 	  send_to_SPI((short)(Angle_Max>>12),2048,7);                                               //H口为磁通门转子位置角减去光电转子位置角
 
 //	  ParkI.Angle = EQEPPare.ElecTheta;
@@ -216,8 +216,8 @@ interrupt void MainISR(void)
 
 	  pi_id.Ref = _IQ(0.0);
 	  pi_iq.Ref= pi_spd.Out;
-//      send_to_SPI((short)((pi_iq.Ref>>14)),2048,0);//                             DAC的A口为Iq电流给定
-//      send_to_SPI((short)((pi_iq.Fbk>>14)),2048,1);//                             DAC的B口为Iq电流反馈
+      send_to_SPI((short)((pi_iq.Ref>>14)),2048,0);//                             DAC的A口为Iq电流给定
+      send_to_SPI((short)((pi_iq.Fbk>>14)),2048,1);//                             DAC的B口为Iq电流反馈
 
 	  pi_id.Fbk = ParkI.Ds;
 	  PI_Controller((p_PI_Control)&pi_id);
